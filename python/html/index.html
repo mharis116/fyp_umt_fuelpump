@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HTSaxon Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Chatbot Widget Styles */
+        #htsaxon-chatbot-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            width: 340px;
+            max-width: 95vw;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+            border-radius: 18px 18px 12px 12px;
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+            background: #fff;
+            transition: box-shadow .2s;
+        }
+
+        @media (max-width: 600px) {
+            #htsaxon-chatbot-widget {
+                width: 98vw;
+                right: 1vw;
+                bottom: 1vw;
+                border-radius: 12px 12px 0 0;
+            }
+        }
+
+        #htsaxon-chatbot-header {
+            background: #212529;
+            color: #fff;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        #htsaxon-chatbot-header .bot-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            margin-right: 0.75rem;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        #htsaxon-chatbot-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: opacity .16s;
+        }
+
+        #htsaxon-chatbot-close:hover {
+            opacity: 1;
+        }
+
+        #htsaxon-chatbot-body {
+            background: #f7f7fa;
+            height: 350px;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .htsaxon-message {
+            margin-bottom: 0.75rem;
+            display: flex;
+        }
+
+        .htsaxon-message.user .htsaxon-bubble {
+            margin-left: auto;
+            background: #e1f5fe;
+            color: #222;
+            border-radius: 16px 16px 4px 16px;
+        }
+
+        .htsaxon-message.bot .htsaxon-bubble {
+            margin-right: auto;
+            background: #22223b;
+            color: #fff;
+            border-radius: 16px 16px 16px 4px;
+        }
+
+        .htsaxon-bubble {
+            padding: .75rem 1.05rem;
+            font-size: 1.01rem;
+            max-width: 78%;
+            word-break: break-word;
+            box-shadow: 0 2px 8px 0 rgba(30, 30, 60, .06);
+        }
+
+        #htsaxon-chatbot-footer {
+            padding: 0.8rem 1rem;
+            background: #fff;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        #htsaxon-chatbot-input {
+            flex: 1;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            padding: 0.45rem 1rem;
+            font-size: 1.05rem;
+            outline: none;
+            margin-right: 0.5rem;
+            background: #fafbfc;
+            transition: border-color .18s;
+        }
+
+        #htsaxon-chatbot-input:focus {
+            border-color: #0d6efd;
+        }
+
+        #htsaxon-chatbot-send {
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .18s;
+        }
+
+        #htsaxon-chatbot-send:active {
+            background: #0a58ca;
+        }
+
+        /* "Open Chat" Button Animation */
+        #htsaxon-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9998;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 18px rgba(13, 110, 253, 0.19);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            animation: htsaxon-pulse 1.2s infinite alternate;
+            cursor: pointer;
+            outline: none;
+            transition: box-shadow .22s;
+        }
+
+        #htsaxon-fab:active {
+            background: #084298;
+        }
+
+        @keyframes htsaxon-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.25);
+            }
+
+            100% {
+                box-shadow: 0 0 0 14px rgba(13, 110, 253, 0.01);
+            }
+        }
+
+        @media (max-width: 600px) {
+            #htsaxon-fab {
+                width: 50px;
+                height: 50px;
+                font-size: 1.7rem;
+                right: 1vw;
+                bottom: 1vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Floating Action Button -->
+    <button id="htsaxon-fab" title="Chat with us!">
+        <span class="bi bi-chat-dots"></span>
+    </button>
+
+    <!-- Chatbot View -->
+    <div id="htsaxon-chatbot-widget" class="shadow">
+        <div id="htsaxon-chatbot-header">
+            <div class="d-flex align-items-center">
+                <img class="bot-avatar" src="https://ui-avatars.com/api/?name=HT+Saxon&background=0d6efd&color=fff"
+                    alt="Bot Avatar" />
+                <div>
+                    <strong>HTSAXON</strong><br>
+                    <small style="font-size: .9em; color: #b2b9cc;">Support Chatbot</small>
+                </div>
+            </div>
+            <button id="htsaxon-chatbot-close" aria-label="Close chat">&times;</button>
+        </div>
+        <div id="htsaxon-chatbot-body"></div>
+        <div id="htsaxon-chatbot-footer">
+            <input type="text" id="htsaxon-chatbot-input" placeholder="Type your message..." autocomplete="off">
+            <button id="htsaxon-chatbot-send" title="Send">
+                <!-- <span class="bi bi-send-fill">&#9658;</span> -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                    <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS & jQuery (v3.6+) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script>
+        // --- Chatbot JS ---
+
+        const LS_KEY = "htsaxon_chat_history";
+        const API_URL = "http://localhost:5000/chat";
+        let chatOpen = false;
+
+        // Render markdown using marked.js (add via CDN)
+        // Add this line in your <head> or here:
+        // (see below for full integration)
+
+        function saveChatHistory(history) {
+            localStorage.setItem(LS_KEY, JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            const h = localStorage.getItem(LS_KEY);
+            return h ? JSON.parse(h) : [];
+        }
+
+        function renderMessages(history) {
+            const body = $("#htsaxon-chatbot-body");
+            body.empty();
+            for (const msg of history) {
+                const isUser = msg.role === "user";
+                const msgClass = isUser ? "user" : "bot";
+                const avatar = isUser
+                    ? '<span class="me-2"></span>'
+                    : `<img class="bot-avatar me-2" src="https://ui-avatars.com/api/?name=HT+Saxon&background=0d6efd&color=fff" style="width:28px;height:28px;">`;
+                // If bot, render markdown
+                let bubbleContent;
+                if (!isUser) {
+                    bubbleContent = `<div class="markdown-body">${marked.parse(msg.text)}</div>`;
+                } else {
+                    bubbleContent = escapeHtml(msg.text);
+                }
+                body.append(`
+                    <div class="htsaxon-message ${msgClass}">
+                        ${!isUser ? avatar : ""}
+                        <div class="htsaxon-bubble">${bubbleContent}</div>
+                        ${isUser ? avatar : ""}
+                    </div>
+                `);
+            }
+            //   body.scrollTop(body[0].scrollHeight);
+            // scrollChatToBottom();
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[\"&'\/<>]/g, function (a) {
+                return {
+                    '"': '&quot;', '&': '&amp;', "'": '&#39;',
+                    '/': '&#47;', '<': '&lt;', '>': '&gt;'
+                }[a];
+            });
+        }
+
+        function addMessage(role, text) {
+            const history = loadChatHistory();
+            history.push({ role, text });
+            saveChatHistory(history);
+            renderMessages(history);
+        }
+
+        function sendMessage() {
+            const input = $("#htsaxon-chatbot-input");
+            const query = input.val().trim();
+            if (!query) return;
+            addMessage("user", query);
+            input.val("").focus();
+            botTyping();
+
+            // API call
+            $.ajax({
+                url: API_URL,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ query }),
+                success: function (res) {
+                    removeBotTyping();
+                    addMessage("bot", res.response || "Sorry, no answer received.");
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    removeBotTyping();
+                    addMessage("bot", "Chat is not available right now. Please try again later.");
+                    console.error("Chatbot API error:", textStatus, errorThrown, xhr && xhr.responseText ? xhr.responseText : '');
+                }
+            });
+        }
+
+        function scrollChatToBottom() {
+            const body = $("#htsaxon-chatbot-body");
+            setTimeout(() => {
+                if (body.length && body[0]) {
+                    body[0].scrollTop = body[0].scrollHeight;
+                }
+            }, 0); // slight delay for rendering
+        }
+
+        function botTyping() {
+            removeBotTyping();
+            const body = $("#htsaxon-chatbot-body");
+            body.append(`
+                <div class="htsaxon-message bot" id="htsaxon-bot-typing">
+                <img class="bot-avatar me-2" src="https://ui-avatars.com/api/?name=HT+Saxon&background=0d6efd&color=fff" style="width:28px;height:28px;">
+                <div class="htsaxon-bubble">
+                    <span class="htsaxon-typing-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    </span>
+                </div>
+                </div>
+            `);
+            body.scrollTop(body[0].scrollHeight);
+        }
+
+        function removeBotTyping() {
+            $("#htsaxon-bot-typing").remove();
+        }
+
+        // function openChat() {
+        //     chatOpen = true;
+        //     $("#htsaxon-chatbot-widget").fadeIn(220);
+        //     $("#htsaxon-fab").fadeOut(120);
+        //     setTimeout(() => $("#htsaxon-chatbot-input").focus(), 320);
+        // }
+        function openChat() {
+            chatOpen = true;
+            scrollChatToBottom(); // Ensures scrolling happens after fade-in completes
+
+            $("#htsaxon-chatbot-widget").fadeIn(220, function() {
+                $("#htsaxon-chatbot-input").focus();
+            });
+            $("#htsaxon-fab").fadeOut(120);
+        }
+
+        function closeChat() {
+            chatOpen = false;
+            $("#htsaxon-chatbot-widget").fadeOut(160);
+            $("#htsaxon-fab").fadeIn(240);
+        }
+
+        // --- Animation to invite user on load ---
+        $(window).on('load', function () {
+            setTimeout(() => {
+                // Animate the FAB (already pulsing)
+                // After 2s, show a speech bubble
+                let bubble = $('<div id="htsaxon-bubble-invite" style="position:fixed;right:98px;bottom:70px;z-index:10000;background:#fff;border-radius:12px;padding:1rem 1.3rem;box-shadow:0 3px 14px rgba(0,0,0,0.15);font-size:1.08rem;color:#222;opacity:0;pointer-events:none;transition:opacity .5s;">👋 Hi! Chat with us</div>');
+                $("body").append(bubble);
+                setTimeout(() => { bubble.css("opacity", 1); }, 100);
+                setTimeout(() => { bubble.fadeOut(600, () => bubble.remove()); }, 4000);
+            }, 1200);
+        });
+
+        // --- Event Bindings ---
+        $(function () {
+            // Open and close chat
+            $("#htsaxon-fab").on("click", openChat);
+            $("#htsaxon-chatbot-close").on("click", closeChat);
+
+            // Send on button or enter key
+            $("#htsaxon-chatbot-send").on("click", sendMessage);
+            $("#htsaxon-chatbot-input").on("keypress", function (e) {
+                if (e.which === 13) sendMessage();
+            });
+
+            // Restore chat history
+            renderMessages(loadChatHistory());
+        });
+
+        // --- Responsive: shrink body on mobile when keyboard opens ---
+        window.addEventListener("resize", function () {
+            if (chatOpen) $("#htsaxon-chatbot-body").scrollTop($("#htsaxon-chatbot-body")[0].scrollHeight);
+        });
+    </script>
+
+    <!-- Add this in your <head> or before this script -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Markdown styling for chatbot, compatible with Bootstrap */
+        .markdown-body ul {
+            padding-left: 1.3em;
+            margin-bottom: 0;
+        }
+
+        .markdown-body li {
+            margin-bottom: .2em;
+        }
+
+        .htsaxon-typing-dots .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            border-radius: 50%;
+            background: #bbb;
+            animation: htsaxon-dot-bounce 1s infinite alternate;
+        }
+
+        .htsaxon-typing-dots .dot:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .htsaxon-typing-dots .dot:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+        @keyframes htsaxon-dot-bounce {
+            0% {
+                transform: translateY(0);
+                background: #bbb;
+            }
+
+            60% {
+                transform: translateY(-6px);
+                background: #0d6efd;
+            }
+
+            100% {
+                transform: translateY(0);
+                background: #bbb;
+            }
+        }
+    </style>
+</body>
+
+</html>
