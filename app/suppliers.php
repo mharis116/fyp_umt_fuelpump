@@ -1,0 +1,14 @@
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class suppliers extends Model
+{
+    use HasFactory;
+    protected $fillable = [
+        'name','email','phone1','phone2','city','address','opening_bal','date','op_bal_id','company'
+    ];
+}
