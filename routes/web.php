@@ -12,7 +12,6 @@
 |
 */
 
-
 Auth::routes();
 
 //     Route::group(['prefix' => 'email'], function(){
