@@ -14,6 +14,31 @@
 
 Auth::routes();
 
+Route::middleware(["auth"])->group(function(){
+    Route::middleware(['admin'])->group(function(){
+        Route::middleware(['other'])->group(function(){
+            Route::resource('supplier','suplierController');
+            Route::resource('customer','customerController');
+            Route::resource('user','usercontroller');
+            Route::resource('roles', RoleController::class);
+
+            // will be done 
+            Route::resource('products','ProductsController');
+            Route::resource('sale','salesController');
+            Route::resource('purchase','purchaseController');
+            Route::resource('custledger','custledgercontroller');
+            Route::resource('supledger','supledgercontroller');
+            Route::resource('exptype','exptypecontroller');
+            Route::resource('exp','expcontroller');
+            Route::resource('dip','dipcontroller');
+            Route::resource('stock','stockcontroller');
+            Route::resource('tra','transactioncontroller');
+            Route::resource('ctra','ctransactioncontroller');
+
+        });
+    });
+    Route::put('eup','HomeController@error')->name('eup');
+});
 //     Route::group(['prefix' => 'email'], function(){
 //         Route::get('inbox', function () { return view('pages.email.inbox'); });
 //         Route::get('read', function () { return view('pages.email.read'); });
