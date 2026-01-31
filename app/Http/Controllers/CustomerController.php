@@ -7,8 +7,43 @@ use App\customers;
 use App\cust_ledger;
 use Illuminate\Support\Facades\Session;
 
-class customerController extends Controller
+class CustomerController extends Controller
 {
+    public $module_code;
+    public $ignored_permission_methods = [];
+    public $permission_methods = [];
+    public function __construct(){
+        $this->inject_permissions();
+    }
+
+    public function inject_permissions(){
+        $this->module_code = 'customers';
+        $this->ignored_permission_methods = [
+        ];
+        $this->permission_methods = [
+            'index' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'show' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'edit' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'update' => [
+                'module_permission_type_code' => 'update',
+            ],
+            'create' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'store' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'destroy' => [
+                'module_permission_type_code' => 'delete',
+            ],
+        ];
+    }
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +55,7 @@ class customerController extends Controller
 
         return view('customer.index')->with('data',$data);
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -146,7 +181,7 @@ class customerController extends Controller
                 Session::flash('success','Customer Deleted Successfully !');
                 return redirect()->back();
             }
-            
+
         }
         else
         {
