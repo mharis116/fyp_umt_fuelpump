@@ -1,0 +1,136 @@
+@extends('layout.master')
+@push('plugin-styles')
+  <link href="{{ asset('assets/plugins/datatables-net/dataTables.bootstrap4.css') }}" rel="stylesheet" />
+@endpush
+@push('plugin-scripts')
+  <script src="{{ asset('assets/plugins/datatables-net/jquery.dataTables.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables-net-bs4/dataTables.bootstrap4.js') }}"></script>
+@endpush
+
+@push('custom-scripts')
+  <script src="{{ asset('assets/js/data-table.js') }}"></script>
+@endpush
+@section('content')
+<a href="{{route('dip.create')}}">
+    <div class="btn-group float-right " role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-primary p-0 px-2 text-light">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+        </button>
+        <button type="button" class="btn btn-primary px-2 text-light">Add</button>
+      </div>
+</a>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" aria-current="page">Dips /</li>
+    </ol>
+</nav>
+          
+<br>
+<div class="row">
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Fuels</h6>
+                <div class="table-responsive">
+                    <table id="dataTableExample" class="table text-center">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>SKU</th>
+                                <th>Last Stock</th>
+                                <th>Dip Qty</th>
+                                <th>Change in Qty</th>
+                                <th>Desc</th>
+                                @if(auth()->user()->account_type == 'admin') 
+                                <th>Function</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($data as $p)
+                                <tr>
+                                    <td>{{$p->date}}</td>
+                                    <td>{{$p->name}}</td>
+                                    <td>{{$p->sku}}</td>
+                                    @php
+                                        if ($p->sighn == '+'){
+                                            $si = $p->qty - $p->change_in_qty;
+                                        }elseif($p->sighn == 'Equal'){
+                                            $si = $p->qty + $p->change_in_qty;
+                                        }elseif($p->sighn == '-'){
+                                            $si = $p->qty + $p->change_in_qty;
+                                        }
+                                    @endphp
+                                    <td>{{$si}} ltrs</td>
+                                    <td>{{$p->qty}} ltrs</td>
+                                    <td>{{$p->sighn}} {{$p->change_in_qty}} ltrs</td>
+                                    <td>{{$p->ddesc}}</td>
+                            
+                                    @if(auth()->user()->account_type == 'admin') 
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary text-light float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="{{route('dip.edit',$p->id)}}">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                    <span class="ml-2"> Edit</span> </a>
+                                                <div class="dropdown-item pointer"  onclick="$('#frm{{$p->id}}').submit()">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                                    <span class="ml-2">Delete</span>
+                                                </div>
+                                                <form action="{{route('dip.destroy',$p->id)}}" id="frm{{$p->id}}" method="post">
+                                                @csrf
+                                                @method('Delete')
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title mb-0">Fuel Guage</h6>
+                @foreach($stock as $st)
+                    @php
+                        $qt = $st->qty;
+                        $cap = $st->stock_capacity;
+                        $pert = $qt/$cap;
+                        $per = round($pert*100,2);
+                        if($per <= 50 and $per > 40){
+                            $color = 'info';
+                            }elseif($per <= 40 and $per > 15){
+                            $color = 'warning';
+                            }elseif($per <= 15){
+                            $color = 'danger';
+                            }else{
+                            $color = 'success';
+                            }
+                    @endphp
+                    <div class="form-group my-2">
+                        <label for="">{{$st->name}}:</label>
+                        <div class="progress">
+                            <div class="progress-bar-striped progress-bar-animated bg-{{$color}} text-center text-light" role="progressbar" style="width:{{$per}}%;padding-top:10px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="{{$per}}%"><span style='position:absolute;'>{{$per}}%</span></div>
+                        </div>
+                        <label for="" >{{$qt}} ltrs</label>
+                        <label for="" class="float-right">{{$cap}} ltrs</label>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+@endsection

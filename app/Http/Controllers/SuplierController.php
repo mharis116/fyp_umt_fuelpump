@@ -7,8 +7,44 @@ use App\suppliers;
 use Illuminate\Support\Facades\Session;
 use App\sup_ledger;
 
-class suplierController extends Controller
+class SuplierController extends Controller
 {
+
+    public $module_code;
+    public $ignored_permission_methods = [];
+    public $permission_methods = [];
+    public function __construct(){
+        $this->inject_permissions();
+    }
+
+    public function inject_permissions(){
+        $this->module_code = 'suppliers';
+        $this->ignored_permission_methods = [
+        ];
+        $this->permission_methods = [
+            'index' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'show' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'edit' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'update' => [
+                'module_permission_type_code' => 'update',
+            ],
+            'create' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'store' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'destroy' => [
+                'module_permission_type_code' => 'delete',
+            ],
+        ];
+    }
     /**
      * Display a listing of the resource.
      *
@@ -134,9 +170,9 @@ class suplierController extends Controller
      */
     public function destroy($id)
     {
-        $custl = sup_ledger::where('sup_id',$id)->where('type','!=','opbl')->exists();
-        // dd($custl);
-        if(!$custl){
+        $supplier_ledger = sup_ledger::where('sup_id',$id)->where('type','!=','opbl')->exists();
+        // dd($supplier_ledger);
+        if(!$supplier_ledger){
             suppliers::where('id',$id)->update(['isdeleted'=>1]);
             sup_ledger::where('sup_id',$id)->where('type','opbl')->update(['isdeleted'=>1]);
             Session::flash('success','Supplier Deleted Successfully !');

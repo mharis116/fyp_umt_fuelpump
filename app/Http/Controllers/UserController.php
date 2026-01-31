@@ -6,9 +6,47 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-class usercontroller extends Controller
+
+class UserController extends Controller
 {
+
+    public $module_code;
+    public $ignored_permission_methods = [];
+    public $permission_methods = [];
+    public function __construct(){
+        $this->inject_permissions();
+    }
+
+    public function inject_permissions(){
+        $this->module_code = 'users-management';
+        $this->ignored_permission_methods = [
+        ];
+        $this->permission_methods = [
+            'index' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'show' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'edit' => [
+                'module_permission_type_code' => 'read',
+            ],
+            'update' => [
+                'module_permission_type_code' => 'update',
+            ],
+            'create' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'store' => [
+                'module_permission_type_code' => 'create',
+            ],
+            'destroy' => [
+                'module_permission_type_code' => 'delete',
+            ],
+        ];
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +54,9 @@ class usercontroller extends Controller
      */
     public function index()
     {
-        $data = User::where('isdeleted',0)->where('account_type','!=','admin')->get();
+        $data = User::where('isdeleted',0)
+        ->where('is_system','!=', 1)
+        ->get();
         return view('user.index')->with('data',$data);
     }
 
@@ -43,20 +83,25 @@ class usercontroller extends Controller
             'contact' => 'required|unique:users',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:150',
             'email' => 'required|unique:users',
+            'role_ids' => ['required', 'array', "min:1"],
+            'role_ids.*' => ['required', Rule::exists('roles', 'id')],
         ]);
 
         $password = $request->password;
         $conpass = $request->cpassword;
         if($conpass == $password){
-            
+
             $user = User::create([
                 'name' =>  strtolower($request->name),
                 'email' => $request->email,
                 'contact' => $request->contact,
                 'password' => Hash::make($request->password),
-                'account_type' => $request->acc_type,
+                // 'account_type' => $request->acc_type,
+                'account_type' => "admin",
                 'isactive' => 1,
             ]);
+            $user->roles()->sync($request->role_ids);
+
             if ($request->hasFile('logo')) {
                 $file = $request->file('logo');
                 $format = $request->logo->extension();
@@ -111,12 +156,14 @@ class usercontroller extends Controller
             'contact' => 'required|unique:users,contact,'.$id,
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:150',
             'email' => 'required|unique:users,email,'.$id,
+            'role_ids' => ['required', 'array', "min:1"],
+            'role_ids.*' => ['required', Rule::exists('roles', 'id')],
         ]);
 
         $password = isset($request->password)?$request->password:1;
         $conpass = isset($request->cpassword)?$request->cpassword:1;
         if($conpass == $password){
-            
+
             $user = User::find($id);
             $user->name =  strtolower($request->name);
             $user->email = $request->email;
@@ -125,8 +172,12 @@ class usercontroller extends Controller
             if(isset($request->password)){
                 $user->password = Hash::make($request->password);
             }
-            $user->account_type = $request->acc_type;
+            // $user->account_type = $request->acc_type;
+            $user->account_type = "admin";
             $user->save();
+
+            $user->roles()->sync($request->role_ids);
+
             if ($request->hasFile('logo')) {
                 $file = $request->file('logo');
                 $format = $request->logo->extension();
