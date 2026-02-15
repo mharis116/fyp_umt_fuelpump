@@ -32,6 +32,14 @@ Route::middleware([
             Route::resource('backup', FuelBackupController::class);
     //     });
 
+     Route::prefix('hierarchy')->controller(HierarchyController::class)->name('hierarchy.')->group(function () {
+        Route::get('/import', 'import_hierarchy_view')->name('index');
+        Route::post('/import', 'import_hierarchy')->name('import');
+        Route::get('/data', 'get_tree_data')->name('tree');
+        Route::get('/level/{level_id}/locations', 'get_hierarchy_level_locations')->name('level.locations');
+        Route::get('/location/{hierarchy_id}/assets', 'get_hierarchy_location_assets')->name('level.location.assets');
+        Route::post('/node/location/create', 'create_node_location')->name('create.node.location');
+    });
     //  Route::middleware(['other'])->group(function(){
         Route::get('data/{data}',[SalesController::class, 'dt']);
         Route::get('/data/ledger/{data}',[SalesController::class, 'ledger']);

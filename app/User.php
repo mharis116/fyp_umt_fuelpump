@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use App\Models\Hierarchy;
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -36,5 +38,29 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-  
+
+
+    public function hierarchies(){
+
+        return $this->belongsToMany(
+            Hierarchy::class,           // Related model
+            'assign_hierarchy_to_user', // Pivot table
+            'user_id',                  // Foreign key on pivot for User
+            'hierarchy_id',             // Foreign key on pivot for hierarchy
+            'id',                       // Local key on User table
+            'id'                        // Local key on hierarchy table
+        );
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(
+            Role::class,        // Related model
+            'user_has_roles',       // Pivot table
+            'user_id',              // Foreign key on pivot for User
+            'role_id',           // Foreign key on pivot for Location
+            'id',                   // Local key on User table
+            'id'                    // Local key on Location table
+        );
+    }
 }

@@ -80,7 +80,7 @@
                                 'desc' => 'Do you realy want to  Update Your Profile !'
                             ];
                         @endphp
-                        @include('partials.popup',$data) 
+                        @include('partials.popup',$data)
                     </form>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                     <div class="card-body">
                         <h6 class="card-title">Profile Pic</h6>
                         <div class="text-center">
-                            <img src="{{asset('storage/prof'.$user->logo)}}" alt=""  style="width: 150px;height:150px;border-radius:50%;">
+                            <img src="{{asset('storage/prof'.$user->logo)}}" alt=""  onerror="this.src='{{asset('assets/images/placeholder.jpg')}}'"  style="width: 150px;height:150px;border-radius:50%;">
                         </div>
                         <br>
                     </div>

@@ -9,7 +9,7 @@
     </ol>
 </nav>
 <br>
-@if(auth()->user()->account_type == 'admin') 
+@if(auth()->user()->account_type == 'admin')
     <div class="row">
         <div class="col-md-{{isset($dat->logo)? '8':'12'}}">
             <div class="card">
@@ -36,7 +36,7 @@
                                     <input type="text" name="name" id="name"  value="{{isset($dat->name)?$dat->name:old('name')}}" class="form-control inputa" placeholder="Name" required autofocus>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="acc_type">Account Type:</label>
                                     <select name="acc_type" id="acc_type" class="form-control inputa" required autofocus>
@@ -47,9 +47,24 @@
                                         <option value="supplier" {{isset($dat->account_type)?$dat->account_type == 'supplier' ? 'selected':null:null}}>Supplier</option>
                                     </select>
                                 </div>
+                            </div> --}}
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role_ids" class="form-label text-danger">{{ __('Roles') }}</label>
+                                    <select name="role_ids[]" class="form-control @error('role_ids') is-invalid @enderror"  id="role_ids">
+                                        <option value="" >-- Select --</option>
+                                        @foreach(App\Role::dropdown()??[] as $role)
+                                            <option value="{{$role->id}}" {{isset($dat)?$dat?->roles->where('id', $role->id)->first()? 'selected':'':''}}>{{$role->name}}</option>
+                                        @endforeach
+                                        {{-- <option value="inactive" {{ old('status', $user?->status) == 'inactive'?'selected':'' }}>In-Active</option> --}}
+                                    </select>
+                                    {!! $errors->first('role_ids', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
+
+
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Email:</label>
@@ -83,6 +98,48 @@
                             @endif
                         </div>
                         <div class="row">
+
+                            <div class="col-md-12">
+                                <hr>
+                                <label for="">Hierarchy Details</label>
+                                <hr>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="hierarchy_level_id" class="form-label">{{ __('Hierarchy Level') }}</label>
+                                    <input type="hidden" name="is_hierarchy_end_level" id="is_hierarchy_end_level" value="0">
+                                    <select name="hierarchy_level_id" onchange="load_hierarchy_locations()" class="form-control @error('hierarchy_level_id') is-invalid @enderror"  id="hierarchy_level_id">
+                                        <option value="" >-- Select --</option>
+                                        @php
+                                            $last_level_id = null;
+                                        @endphp
+                                        @foreach(App\Models\HierarchyLevel::dropdown()??[] as $hierarchy_level)
+                                            <option value="{{$hierarchy_level->id}}" {{$dat->hierarchy_level_id == $hierarchy_level->id? 'selected':''}}>{{$hierarchy_level->name}}</option>
+                                            @php
+                                                $last_level_id = $hierarchy_level->id;
+                                            @endphp
+                                        @endforeach
+                                    </select>
+                                    {!! $errors->first('hierarchy_level_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="hierarchy_id" class="form-label">{{ __('Hierarchy Location') }}</label>
+                                    <select name="hierarchy_ids[]" multiple class="form-control select2 @error('hierarchy_id') is-invalid @enderror"  id="hierarchy_id">
+                                        <option value="" >-- Select Hierarchy Level First --</option>
+                                    </select>
+                                    {!! $errors->first('hierarchy_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <hr>
+                                <label for="">Credential Details</label>
+                                <hr>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="password">Password:</label>
@@ -96,6 +153,7 @@
                                 </div>
                             </div>
                         </div>
+
                         @php
                         $data=[
                                 'button' => isset($dat)? 'Update' : 'Create',
@@ -106,7 +164,7 @@
                                 'desc' => 'Do you realy want to add or Update User!'
                             ];
                         @endphp
-                        @include('partials.popup',$data) 
+                        @include('partials.popup',$data)
                     </form>
                 </div>
             </div>
@@ -126,4 +184,43 @@
         @endif
     </div>
 @endif
+
 @endsection
+
+@push('scripts')
+    <script>
+
+        let user_hierarchy_ids = {!! json_encode($dat->hierarchies->pluck('id')) !!};
+        let last_level_id = {{ $last_level_id }};
+        function load_hierarchy_locations(){
+            let hierarchy_level_id = $('#hierarchy_level_id option:selected').val();
+            let hierarchy_id_select_elem = $('#hierarchy_id');
+
+            if(last_level_id == hierarchy_level_id){
+                $('#is_hierarchy_end_level').val(1);
+            }else{
+                $('#is_hierarchy_end_level').val(0);
+            }
+
+            $.get(`/hierarchy/level/${hierarchy_level_id}/locations`).then(function(response){
+                hierarchy_id_select_elem.empty();
+                hierarchy_id_select_elem.append(`<option value="">-- Select --</option>`);
+                response.data?.forEach(function(hierarchy){
+                    let selected = user_hierarchy_ids.includes(hierarchy.id) ? 'selected' : '';
+                    hierarchy_id_select_elem.append(`<option value="${hierarchy.id}" ${selected}>${hierarchy?.location?.name}</option>`);
+                });
+
+            })
+            .fail(function(xhr){
+                xhr.responseJSON.errors.forEach(function(error) {
+                    toastr.error(error);
+                });
+            })
+        }
+
+        $(document).ready(function(){
+            load_hierarchy_locations();
+            $('.select2').select2();
+        });
+    </script>
+@endpush
