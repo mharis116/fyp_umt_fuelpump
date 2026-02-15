@@ -11,7 +11,7 @@
   <script src="{{ asset('assets/js/data-table.js') }}"></script>
 @endpush
 @section('content')
-@if(auth()->user()->account_type == 'admin') 
+@if(auth()->user()->account_type == 'admin')
     <a href="{{route('user.create')}}">
         <div class="btn-group float-right " role="group" aria-label="Basic example">
             <button type="button" class="btn btn-primary p-0 px-2 text-light">
@@ -26,13 +26,13 @@
         <li class="breadcrumb-item" aria-current="page">Users /</li>
     </ol>
 </nav>
-          
+
 <br>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title">Fuels</h6>
+                <h6 class="card-title">Users</h6>
                 <div class="table-responsive">
                     <table id="dataTableExample" class="table text-center">
                         <thead>
@@ -41,10 +41,10 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Contact</th>
-                                <th>Account Type</th>
+                                <th>Role</th>
                                 <th>Created At</th>
                                 <th>Status</th>
-                                @if(auth()->user()->account_type == 'admin') 
+                                @if(auth()->user()->account_type == 'admin')
                                     <th>Function</th>
                                 @endif
                             </tr>
@@ -54,27 +54,28 @@
                                 <tr>
                                     <td>
                                         <div class="text-center">
-                                            <img src="{{asset('storage/prof'.$p->logo)}}" alt=""  style="width: 50px;height:50px;border-radius:50%;">
-                                        </div>    
+                                            <img src="{{asset('storage/prof'.$p->logo)}}" onerror="this.src='{{asset('assets/images/placeholder.jpg')}}'" alt=""  style="width: 50px;height:50px;border-radius:50%;">
+                                        </div>
                                     </td>
                                     <td>{{$p->name}}</td>
                                     <td>{{$p->email}}</td>
                                     <td>{{$p->contact}}</td>
-                                    <td>{{$p->account_type}}</td>
+                                    <td>{{ implode(',', $p->roles->pluck('name')->toArray()) }}</td>
+                                    {{-- <td>{{$p->account_type}}</td> --}}
                                     <td>{{$p->created_at}}</td>
                                     <td>
                                         @if ($p->isactive == 1)
 
-                                            <div class="btn btn-success">Active</div>
+                                            <div class="badge bg-success rounded-pill">Active</div>
 
                                         @elseif($p->isactive == 0)
-                                            
-                                            <div class="btn btn-danger">Not Active</div>
+
+                                            <div class="badge bg-danger rounded-pill">Not Active</div>
 
                                         @endif
                                     </td>
-                            
-                                    @if(auth()->user()->account_type == 'admin') 
+
+                                    {{-- @if(auth()->user()->account_type == 'admin') --}}
                                     <td>
                                         <div class="dropdown">
                                             <button class="btn btn-primary text-light float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -95,7 +96,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    @endif
+                                    {{-- @endif --}}
                                 </tr>
                             @endforeach
                         </tbody>
@@ -105,8 +106,8 @@
             </div>
         </div>
     </div>
- 
-    
+
+
 </div>
 
 @endsection
