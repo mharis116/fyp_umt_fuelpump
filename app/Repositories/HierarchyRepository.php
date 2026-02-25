@@ -342,4 +342,8 @@ class HierarchyRepository
         return $hierarchies;
     }
 
+    public function dropdown(array $hierarchyIds){
+        return $this->getEndLevelHierarchiesData($hierarchyIds);
+    }
+
 }
