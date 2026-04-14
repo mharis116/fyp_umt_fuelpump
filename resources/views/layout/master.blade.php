@@ -1,49 +1,58 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>{{ config('app.name') }}</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
-  <!-- CSRF Token -->
-  <meta name="_token" content="{{ csrf_token() }}">
-  
-  <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}">
+    <title>{{ config('app.name') }}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- plugin css -->
-  <link href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/flag-icon-css/css/flag-icon.min.css') }}" rel="stylesheet" />
-  <link href="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.css') }}" rel="stylesheet" />
-  <!-- end plugin css -->
+    <!-- CSRF Token -->
+    <meta name="_token" content="{{ csrf_token() }}">
 
-  @stack('plugin-styles')
-  <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
-  <link href="{{ asset('css/style.css') }}" rel="stylesheet" />
-  <!-- end common css -->
-  <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <link rel="shortcut icon" href="{{ asset('/favicon.ico') }}">
 
-  @stack('style')
+    <!-- plugin css -->
+    <link href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/flag-icon-css/css/flag-icon.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- end plugin css -->
+
+    @stack('plugin-styles')
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet" />
+    <!-- end common css -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    @stack('style')
 </head>
-<body data-base-url="{{url('/')}}" class='sidebar-dark'>
 
-  <script src="{{ asset('assets/js/spinner.js') }}"></script>
+<body data-base-url="{{ url('/') }}" class='sidebar-dark'>
 
-          <div class="main-wrapper" id="app">
-            @if(auth()->user()->isactive == 1)
-              @include('layout.sidebar')
-                <div class="page-wrapper">
-                  @include('layout.header')
-                  <div class="page-content">
-                  @include('partials.alerts')
-                  @yield('content')
-                  </div>
-                  @include('layout.footer')
+    <script src="{{ asset('assets/js/spinner.js') }}"></script>
+
+    <div class="main-wrapper" id="app">
+        @if (auth()->user()->isactive == 1)
+            @include('layout.sidebar')
+            <div class="page-wrapper">
+                @include('layout.header')
+                <div class="page-content">
+                    <div class="wrapper">
+                        @include('layouts.partials.toast')
+                    </div>
+                    @include('partials.alerts')
+                    @yield('content')
                 </div>
-                @else
-                You are not active
-            @endif
-          </div>
+                @include('layout.footer')
+            </div>
+        @else
+            You are not active
+        @endif
+    </div>
 
     <!-- base js -->
     <script src="{{ asset('js/app.js') }}"></script>
@@ -58,10 +67,13 @@
     <!-- common js -->
     <script src="{{ asset('assets/js/template.js') }}"></script>
     <script src="{{ asset('js/fullscreen.js') }}"></script>
-    <script src='{{asset('js/fa.js')}}'  crossorigin='anonymous'></script>
+    <script src='{{ asset('js/fa.js') }}' crossorigin='anonymous'></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- end common js -->
 
     @stack('custom-scripts')
+    @stack('scripts')
 </body>
+
 </html>
