@@ -32,16 +32,19 @@
             <div class="card-body">
                 <h6 class="card-title">Fuels</h6>
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table text-center">
+                    <table id="dataTableExample" class="table ">
                         <thead>
                             <tr>
                                 <th>Date</th>
                                 <th>Name</th>
-                                <th>SKU</th>
+                                {{-- <th>SKU</th> --}}
                                 <th>Last Stock</th>
                                 <th>Dip Qty</th>
                                 <th>Change in Qty</th>
-                                <th>Desc</th>
+                                <th>Temperature</th>
+                                <th>humidity</th>
+                                <th>Prediction</th>
+                                {{-- <th>Desc</th> --}}
                                 @if(auth()->user()->account_type == 'admin') 
                                 <th>Function</th>
                                 @endif
@@ -50,9 +53,9 @@
                         <tbody>
                             @foreach ($data as $p)
                                 <tr>
-                                    <td>{{$p->date}}</td>
+                                    <td>{{$p->date?->format('Y-m-d h:i A')}}</td>
                                     <td>{{$p->name}}</td>
-                                    <td>{{$p->sku}}</td>
+                                    {{-- <td>{{$p->sku}}</td> --}}
                                     @php
                                         if ($p->sighn == '+'){
                                             $si = $p->qty - $p->change_in_qty;
@@ -65,7 +68,33 @@
                                     <td>{{$si}} ltrs</td>
                                     <td>{{$p->qty}} ltrs</td>
                                     <td>{{$p->sighn}} {{$p->change_in_qty}} ltrs</td>
-                                    <td>{{$p->ddesc}}</td>
+                                    <td>{{$p->temperature??0}} C</td>
+                                    <td>{{$p->humidity??0}} mmHg</td>
+                                    <td>
+                                        @php
+                                            switch($p->predicted_label){
+                                                case "theft":
+                                                    $anomaly_color='danger';
+                                                break;
+                                                case "evaporation":
+                                                    $anomaly_color='info';
+                                                break;
+                                                case "normal":
+                                                    $anomaly_color='success';
+                                                break;
+                                                case "missing_purchase":
+                                                    $anomaly_color='warning';
+                                                break;
+                                                default:
+                                                    $anomaly_color='primary';
+                                            }
+                                            
+                                        @endphp
+                                        <div class="badge rounded-pill bg-{{$anomaly_color}}">{{ucwords($p->predicted_label)}}</div>
+                                        <br>
+                                        <br>{{$p->confidence*100}}% Confident
+                                    </td>
+                                    {{-- <td>{{$p->ddesc}}</td> --}}
                             
                                     @if(auth()->user()->account_type == 'admin') 
                                     <td>

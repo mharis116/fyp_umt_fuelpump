@@ -6,8 +6,15 @@ use Illuminate\Http\Request;
 use App\dip;
 use Illuminate\Support\Facades\Session;
 use App\products;
+use App\sales;
+use App\purchases;
+use App\sales_items;
+use App\purchaseItem;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\stock;
+use App\Services\WeatherService;
+use App\Services\AnomalyDetectionService;
 
 class FuelDipController extends Controller
 {
@@ -54,16 +61,21 @@ class FuelDipController extends Controller
      */
     public function index()
     {
-        $stock = db::table('products')
+
+
+        $stock = DB::table('products')
         ->join('stocks','stocks.pro_id','products.id')
         ->select('products.name as name','stocks.*')
         ->where('products.isdeleted',0)
         ->get();
+
         $data = dip::join('products','products.id','pro_id')
         ->where('products.isdeleted',0)
         ->where('dips.isdeleted',0)
         // ->join('stocks','stocks.pro_id','products.id')
-        ->select('products.*','dips.id as dip_id','dips.desc as ddesc','dips.*')->get();
+        ->select('products.*','dips.id as dip_id','dips.desc as ddesc','dips.*')
+        ->get();
+        
         // dd($data);
         return view('dip.index')->with('data',$data)->with('stock',$stock);
     }
@@ -75,6 +87,9 @@ class FuelDipController extends Controller
      */
     public function create()
     {
+        
+        // $response = WeatherService::getCurrentWeather(31.5204, 74.3587);
+        // dd($response);
         $exp  = Products::where('isdeleted',0)->get();
         return view('dip.create')->with('exp',$exp);
     }
@@ -87,9 +102,90 @@ class FuelDipController extends Controller
      */
     public function store(Request $request)
     {
+        $weather = [];
+        try{
+            $weather = WeatherService::getCurrentWeather(31.5204, 74.3587);
+        }catch (\Exception $e){
+            // Session::flash('error', 'Failed to fetch weather data: ' . $e->getMessage());
+            // return redirect()->back();
+        }
+
+        $last_dip = dip::where('pro_id', $request->product)->where('isdeleted', 0)->orderByDesc('id')->first();
+
+        $last_dip_qty = $last_dip ? $last_dip->qty : 0;
+        $current_dip_qty = $request->qty;
+        // $dip_change = $current_dip_qty - $last_dip_qty;
+        // $hours_since_last_dip = $last_dip ? now()->diffInHours($last_dip->date) : null;
+        $hours_since_last_dip = $last_dip ? Carbon::parse($last_dip->date)->diffInHours(now()) : 0;
+        // $net_expected = $last_dip ? ($last_dip->qty + $last_dip->total_purchase_qty - $last_dip->total_sales_qty) : null;
+        // $variance = $current_dip_qty - $net_expected;
+
+
+        $sale = sales_items::where('pro_id', $request->product)
+        ->whereHas('sales', function($q) use ($last_dip) {
+            $q->whereBetween('created_at', [$last_dip->date, now()]);
+        })
+        ->selectRaw('SUM(qty) as total_qty, COUNT(*) as total_count')
+        ->first();
+
+        $purchase = purchaseItem::where('pro_id', $request->product)
+        ->whereHas('purchase', function($q) use ($last_dip) {
+            $q->whereBetween('created_at', [$last_dip->date, now()]);
+        })
+        ->selectRaw('SUM(qty) as total_qty, COUNT(*) as total_count')
+        ->first();
+
+
+        $total_purchase_qty = $purchase->total_qty ?? 0;
+        $total_sales_qty = $sale->total_qty ?? 0;
+        
+        $net_expected = $last_dip_qty + $total_purchase_qty - $total_sales_qty;
+        $variance = $current_dip_qty - $net_expected;
+        $abs_variance = abs($variance);
+        
+        $qty = $request->qty;
+
+        
+
+        // $true_label = $variance > 0 ? 'Over' : ($variance < 0 ? 'Under' : 'Equal');
+        // $predicted_label = $abs_variance > 10 ? ($variance > 0 ? 'Over' : 'Under') : 'Equal';
+        // $true_label = $variance > 0 ? 'Over' : ($variance < 0 ? 'Under' : 'Equal');
+        // $predicted_label = $abs_variance > 10 ? ($variance > 0 ? 'Over' : 'Under') : 'Equal';
+
+        $payload = [
+            'temperature' => $weather['temperature'] ?? null,
+            'humidity' => $weather['humidity'] ?? null,
+            'total_sales_qty' => $total_sales_qty ?? 0,
+            'total_sales_count' => $sale->total_count ?? 0,
+            'total_purchase_qty' => $total_purchase_qty ?? 0,
+            'total_purchase_count' => $purchase->total_count ?? 0,
+            'last_dip_qty' => $last_dip_qty ?? 0,
+            'variance' => $variance ?? 0,
+            'abs_variance' => $abs_variance ?? 0,
+            'qty' => $qty,
+            // 'true_label' => $true_label ?? null,
+            // 'predicted_label' => $predicted_label ?? null,
+        ];
+
+
+        // dd($payload);
+
         $stock = Stock::where('pro_id',$request->product)->first();
         $q = $stock->qty;
-        $qty = $request->qty;
+
+        $anomaly_detection_payload = [
+            "elapsed_hours"=>$hours_since_last_dip,
+            ...$payload
+        ];
+
+        $anomaly_response = app(AnomalyDetectionService::class)->predictAnomaly($anomaly_detection_payload);
+        // variance is inverted makesure nextime train corret variance sign
+
+        // dd($anomaly_response['predicted_label'], $anomaly_response['confidence'], $anomaly_detection_payload);
+        
+        $payload['predicted_label'] = $anomaly_response['predicted_label'];
+        $payload['confidence'] = $anomaly_response['confidence'];
+
         if($q > $qty){
             $t = $q - $qty;
             $st = $q - $t;
@@ -98,13 +194,15 @@ class FuelDipController extends Controller
                 Session::flash('error' ,'Entering Wrong Dip Quantity !');
                 return redirect()->back();
             }else{
+
                 $dip = dip::create([
                     'pro_id' => $request->product,
-                    'qty' => $qty,
+                    // 'qty' => $qty,
                     'change_in_qty' => $t,
                     'sighn' => $s,
                     'desc' => $request->desc,
-                    'date' => date('Y-m-d H:i:s')
+                    'date' => date('Y-m-d H:i:s'),
+                    ...$payload
                 ]);
                 stock::where('pro_id' , $request->product)->update(['qty'=> $st,'dip_id'=>$dip->id]);
                 $request->session()->flash('success','Dip added Succussfully!');
@@ -122,11 +220,12 @@ class FuelDipController extends Controller
             }else{
                 $dip = dip::create([
                     'pro_id' => $request->product,
-                    'qty' => $qty,
+                    // 'qty' => $qty,
                     'change_in_qty' => $t,
                     'desc' => $request->desc,
                     'sighn' => $s,
-                    'date' => date('Y-m-d H:i:s')
+                    'date' => date('Y-m-d H:i:s'),
+                    ...$payload
                 ]);
                 stock::where('pro_id' , $request->product)->update(['qty'=> $st,'dip_id'=>$dip->id]);
                 $request->session()->flash('success','Dip added Succussfully!');
@@ -138,11 +237,12 @@ class FuelDipController extends Controller
             $s = 'Equal';
             $dip = dip::create([
                 'pro_id' => $request->product,
-                'qty' => $qty,
+                // 'qty' => $qty,
                 'change_in_qty' => $t,
                 'desc' => $request->desc,
                 'sighn' => $s,
-                'date' => date('Y-m-d H:i:s')
+                'date' => date('Y-m-d H:i:s'),
+                ...$payload
             ]);
             stock::where('pro_id' , $request->product)->update(['dip_id'=>$dip->id]);
             $request->session()->flash('success','Dip added Succussfully!');
