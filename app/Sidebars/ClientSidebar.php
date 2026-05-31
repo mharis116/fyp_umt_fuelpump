@@ -320,7 +320,15 @@ class ClientSidebar
                         'active_link' => ['report/prices', 'report/prices/*']
                     ]
                 ]
-            ]
+            ],
+            [
+                "name" => "Fuel Sensor Report",
+                "permission" => $this->rolePermissionRepository->getRoutePermission('fuel.guage'),
+                "type" => "link",
+                "active_link" => ['report/fuel-guage', 'report/fuel-guage/*'],
+                "route" => route('fuel.guage'),
+                "icon" => '<i class="fas fa-gas-pump link-icon"></i>', // Preserved font-awesome icon
+            ],
         ];
     }
 }

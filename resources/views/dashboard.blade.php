@@ -1,20 +1,20 @@
 @extends('layout.master')
 
 @push('plugin-styles')
-  <link href="{{ asset('assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet" />
 @endpush
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
-  <div>
-    <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
-  </div>
-  <div class="d-flex align-items-center flex-wrap text-nowrap">
-    <div class="input-group date datepicker dashboard-date mr-2 mb-2 mb-md-0 d-md-none d-xl-flex" id="dashboardDate">
-      <span class="input-group-addon bg-transparent"><i data-feather="calendar" class=" text-primary"></i></span>
-      <input type="text" class="form-control">
-    </div>
-    {{-- <button type="button" class="btn btn-outline-info btn-icon-text mr-2 d-none d-md-block">
+    <div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+        <div>
+            <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
+        </div>
+        <div class="d-flex align-items-center flex-wrap text-nowrap">
+            <div class="input-group date datepicker dashboard-date mr-2 mb-2 mb-md-0 d-md-none d-xl-flex" id="dashboardDate">
+                <span class="input-group-addon bg-transparent"><i class=" text-primary" data-feather="calendar"></i></span>
+                <input class="form-control" type="text">
+            </div>
+            {{-- <button type="button" class="btn btn-outline-info btn-icon-text mr-2 d-none d-md-block">
       <i class="btn-icon-prepend" data-feather="download"></i>
       Import
     </button>
@@ -26,10 +26,10 @@
       <i class="btn-icon-prepend" data-feather="download-cloud"></i>
       Download Report
     </button> --}}
-  </div>
-</div>
+        </div>
+    </div>
 
-{{-- <div class="row">
+    {{-- <div class="row">
   <div class="col-12 col-xl-12 stretch-card">
     <div class="row flex-grow">
       <div class="col-md-4 grid-margin stretch-card">
@@ -142,397 +142,411 @@
   </div>
 </div> --}}
 
-<div class="row">
-  <script>
-    var percent = [];
-    var fuel = [];
-    @foreach($stock as $stt)
-    @php
-        $qtt = $stt->qty;
-        $capp = $stt->stock_capacity;
-        $pertt = $qtt/$capp;
-    @endphp
+    <div class="row">
+        <script>
+            var percent = [];
+            var fuel = [];
+            @foreach ($stock as $stt)
+                @php
+                    $qtt = $stt->qty;
+                    $capp = $stt->stock_capacity;
+                    $pertt = $qtt / $capp;
+                @endphp
 
-      var per = {{round($pertt*100,2)}};
-      percent.push(per);
-      fuel.push('{{$stt->name}}');
-    @endforeach
-    $(function() {
-      'use strict';
-      var optionsr = {
-        chart: {
-          height: 300,
-          type: "radialBar",
-          parentHeightOffset: 0
-        },
-        colors: ["#f77eb9", "#7ee5e5","#4d8af0","#fbbc06","#f77eb9", "#7ee5e5","#4d8af0","#fbbc06"],
-        grid: {
-          borderColor: "rgba(77, 138, 240, .1)",
-          padding: {
-            top: 5
-          }
-        },
-        plotOptions: {
-          radialBar: {
-            dataLabels: {
-              total: {
-                show: true,
-                label: 'TOTAL'
-              }
-            }
-          }
-        },
-        series: percent,
-        labels: fuel
-      };
-      var chartr = new ApexCharts(document.querySelector("#apexRadialBarr"), optionsr);
-
-      chartr.render();
-
-      var chartAreaBounds = chart.w.globals.dom.baseEl.querySelector('.apexcharts-inner').getBoundingClientRect();
-    });
-  </script>
-  <div class="col-md-6 stretch-card">
-    <div class="row flex-grow">
-      <div class="col-md-12 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-baseline">
-              <h6 class="card-title mb-0">Fuel Guage</h6>
-            </div>
-            <br>
-            @foreach($stock as $st)
-            @php
-                $qt = $st->qty;
-                $cap = $st->stock_capacity;
-                $pert = $qt/$cap;
-                $per = round($pert*100,2);
-                if($per <= 50 and $per > 40){
-                    $color = 'info';
-                    }elseif($per <= 40 and $per > 15){
-                    $color = 'warning';
-                    }elseif($per <= 15){
-                    $color = 'danger';
-                    }else{
-                    $color = 'success';
-                    }
-            @endphp
-            <div class="form-group my-2">
-                <label for="">{{$st->name}}:</label>
-                <div class="progress">
-                    <div class="progress-bar-striped progress-bar-animated bg-{{$color}} text-center text-light" role="progressbar" style="width:{{$per}}%;padding-top:10px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" data-toggle="tooltip" data-placement="top" title="{{$per}}%"><span style='position:absolute;'>{{$per}}%</span></div>
-                </div>
-                <label for="" >{{$qt}} ltrs</label>
-                <label for="" class="float-right">{{$cap}} ltrs</label>
-            </div>
-            <br>
+                var per = {{ round($pertt * 100, 2) }};
+                percent.push(per);
+                fuel.push('{{ $stt->name }}');
             @endforeach
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-6 stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title">Fuel Guage</h6>
-        <div id="apexRadialBarr"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-<div class="row">
-  <script>
-    var dp = [];
-    var qp = [];
-    var rp = [];
-    @foreach ($sale as $sr)
-        dp.push('{{date_format(date_create($sr->date),"Y-m-d")}}');
-        qp.push({{$sr->qty}});
-        rp.push({{$sr->rm + $sr->adj}});
-    @endforeach
-    $(function() {
-        'use strict';
-        // Apex Line chart start
-        var optiona = {
-            chart: {
-            type: "area",
-            height: 300,
-            parentHeightOffset: 0,
-
-            },
-            colors: ["#727cf5"],
-            stroke: {
-            curve: "smooth",
-            width: 3
-            },
-            dataLabels: {
-            enabled: false
-            },
-            series: [{
-            name: 'Sale Quantity',
-            data: qp
-            }],
-            markers: {
-            size: 0,
-            strokeColor: "#fff",
-            strokeWidth: 3,
-            strokeOpacity: 1,
-            fillOpacity: 1,
-            hover: {
-                size: 6
-            }
-            },
-            xaxis: {
-                type: "category",
-                categories: dp
-            },
-            yaxis: {
-                labels: {
-                    formatter: function (value) {
-                    return value + " ltrs";
-                    }
-                },
-            },
-            grid: {
-            borderColor: "rgba(77, 138, 240, .1)"
-            },
-            legend: {
-            position: 'top',
-            horizontalAlign: 'left'
-            }
-        };
-        var chart = new ApexCharts(document.querySelector("#apexAreat"), optiona);
-        chart.render();
-
-        var optionz = {
-            chart: {
-            type: "area",
-            height: 300,
-            parentHeightOffset: 0,
-
-            },
-            colors: ["#727cf5"],
-            stroke: {
-            curve: "smooth",
-            width: 3
-            },
-            dataLabels: {
-            enabled: false
-            },
-            series: [{
-            name: 'Sale Cash',
-            data: rp
-            }],
-            markers: {
-            size: 0,
-            strokeColor: "#fff",
-            strokeWidth: 3,
-            strokeOpacity: 1,
-            fillOpacity: 1,
-            hover: {
-                size: 6
-            }
-            },
-            xaxis: {
-                type: "category",
-                categories: dp
-            },
-            yaxis: {
-                labels: {
-                    formatter: function (value) {
-                    return value + " Rs";
-                    }
-                },
-            },
-            grid: {
-            borderColor: "rgba(77, 138, 240, .1)"
-            },
-            legend: {
-            position: 'top',
-            horizontalAlign: 'left'
-            }
-        };
-        var chartrm = new ApexCharts(document.querySelector("#apexArearm"), optionz);
-        chartrm.render();
-    });
-</script>
-  <div class="col-xl-6 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-          <h6 class="card-title">Daily Sale Cash</h6>
-          <div id="apexArearm"></div>
-        </div>
-      </div>
-  </div>
-  <div class="col-xl-6 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title">Daily Fuel Sale</h6>
-        <div id="apexAreat"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-<div class="row">
-  <script>
-      var d = [];
-      var r = [];
-      @foreach ($exp as $sr)
-          d.push('{{$sr->date}}');
-          r.push({{$sr->exp}});
-      @endforeach
-      $(function() {
-          'use strict';
-          // Apex Line chart start
-          var optione = {
-              chart: {
-              type: "area",
-              height: 300,
-              parentHeightOffset: 0,
-
-              },
-              colors: ["#727cf5"],
-              stroke: {
-              curve: "smooth",
-              width: 3
-              },
-              dataLabels: {
-              enabled: false
-              },
-              series: [{
-              name: 'Amount',
-              data: r
-              }],
-              markers: {
-              size: 0,
-              strokeColor: "#fff",
-              strokeWidth: 3,
-              strokeOpacity: 1,
-              fillOpacity: 1,
-              hover: {
-                  size: 6
-              }
-              },
-              xaxis: {
-                  type: "category",
-                  categories: d
-              },
-              yaxis: {
-                  labels: {
-                      formatter: function (value) {
-                      return value + " Rs";
-                      }
-                  },
-              },
-              grid: {
-              borderColor: "rgba(77, 138, 240, .1)"
-              },
-              legend: {
-              position: 'top',
-              horizontalAlign: 'left'
-              }
-          };
-          var charte = new ApexCharts(document.querySelector("#apexAreaexp"), optione);
-          charte.render();
-      });
-  </script>
-  <div class="col-xl-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="card-title">Monthly Expense Report</h6>
-        <div id="apexAreaexp"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<br>
-<div class="row">
-    <script>
-        $(function() {
-        'use strict';
-            var g = [];
-            // var n = [];
-            var date = [];
-            @foreach ($salemy as $sale)
-            @php
-                $rtm = $sale->rtm + $sale->adj;
-                $p = $rtm - $sale->ctm;
-            @endphp
-                var gp  = '{{$p}}';
-                g.push(gp);
-                date.push('{{$sale->date}}');
-            @endforeach
-            var options = {
-                chart: {
-                type: "area",
-                height: 300,
-                parentHeightOffset: 0
-                },
-                colors: ["#727cf5"],
-                stroke: {
-                curve: "smooth",
-                width: 3
-                },
-                dataLabels: {
-                enabled: false
-                },
-                series: [{
-                    name: 'Groce Profit',
-                    data: g
-                }],
-                markers: {
-                size: 0,
-                strokeColor: "#fff",
-                strokeWidth: 3,
-                strokeOpacity: 1,
-                fillOpacity: 1,
-                hover: {
-                    size: 6
-                }
-                },
-                xaxis: {
-                    type: 'category',
-                    categories:date
-                },
-                yaxis: {
-                    labels: {
-                        formatter: function (value) {
-                        return value + " Rs";
+            $(function() {
+                'use strict';
+                var optionsr = {
+                    chart: {
+                        height: 300,
+                        type: "radialBar",
+                        parentHeightOffset: 0
+                    },
+                    colors: ["#f77eb9", "#7ee5e5", "#4d8af0", "#fbbc06", "#f77eb9", "#7ee5e5", "#4d8af0", "#fbbc06"],
+                    grid: {
+                        borderColor: "rgba(77, 138, 240, .1)",
+                        padding: {
+                            top: 5
                         }
-                    }
-                },
-                grid: {
-                borderColor: "rgba(77, 138, 240, .1)"
-                },
-                tooltip: {
-                x: {
-                    format: "dd MMM yyyy"
-                },
-                },
-                legend: {
-                position: 'top',
-                horizontalAlign: 'left'
-                }
-            };
+                    },
+                    plotOptions: {
+                        radialBar: {
+                            dataLabels: {
+                                total: {
+                                    show: true,
+                                    label: 'TOTAL',
+                                    formatter: function(w) {
 
-            var chart = new ApexCharts(document.querySelector("#apexArea1"), options);
+                                      // Sum all percentages
+                                      let total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
 
-            chart.render();
-     });
-    </script>
-    <div class="col-xl-12 grid-margin stretch-card">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="card-title">Date Wise Groce Profit & Loss Report</h6>
-                <div id="apexArea1"></div>
+                                      // Average percentage
+                                      let avg = total / w.globals.series.length;
+
+                                      // return Math.round(avg) + '%';
+
+                                      // or with 2 decimals:
+                                      return avg.toFixed(2) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    series: percent,
+                    labels: fuel
+                };
+                var chartr = new ApexCharts(document.querySelector("#apexRadialBarr"), optionsr);
+
+                chartr.render();
+
+                var chartAreaBounds = chart.w.globals.dom.baseEl.querySelector('.apexcharts-inner').getBoundingClientRect();
+            });
+        </script>
+        <div class="col-md-6 stretch-card">
+            <div class="row flex-grow">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-baseline">
+                                <h6 class="card-title mb-0">Fuel Guage</h6>
+                            </div>
+                            <br>
+                            @foreach ($stock as $st)
+                                @php
+                                    $qt = $st->qty;
+                                    $cap = $st->stock_capacity;
+                                    $pert = $qt / $cap;
+                                    $per = round($pert * 100, 2);
+                                    if ($per <= 50 and $per > 40) {
+                                        $color = 'info';
+                                    } elseif ($per <= 40 and $per > 15) {
+                                        $color = 'warning';
+                                    } elseif ($per <= 15) {
+                                        $color = 'danger';
+                                    } else {
+                                        $color = 'success';
+                                    }
+                                @endphp
+                                <div class="form-group my-2">
+                                    <label for="">{{ $st->name }}:</label>
+                                    <div class="progress">
+                                        <div class="progress-bar-striped progress-bar-animated bg-{{ $color }} text-center text-light" data-toggle="tooltip" data-placement="top" title="{{ $per }}%" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
+                                            style="width:{{ $per }}%;padding-top:10px;"><span style='position:absolute;'>{{ $per }}%</span></div>
+                                    </div>
+                                    <label for="">{{ $qt }} ltrs</label>
+                                    <label class="float-right" for="">{{ $cap }} ltrs</label>
+                                </div>
+                                <br>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Fuel Guage</h6>
+                    <div id="apexRadialBarr"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{{-- <div class="row">
+    <br>
+    <div class="row">
+        <script>
+            var dp = [];
+            var qp = [];
+            var rp = [];
+            @foreach ($sale as $sr)
+                dp.push('{{ date_format(date_create($sr->date), 'Y-m-d') }}');
+                qp.push({{ $sr->qty }});
+                rp.push({{ $sr->rm + $sr->adj }});
+            @endforeach
+            $(function() {
+                'use strict';
+                // Apex Line chart start
+                var optiona = {
+                    chart: {
+                        type: "area",
+                        height: 300,
+                        parentHeightOffset: 0,
+
+                    },
+                    colors: ["#727cf5"],
+                    stroke: {
+                        curve: "smooth",
+                        width: 3
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Sale Quantity',
+                        data: qp
+                    }],
+                    markers: {
+                        size: 0,
+                        strokeColor: "#fff",
+                        strokeWidth: 3,
+                        strokeOpacity: 1,
+                        fillOpacity: 1,
+                        hover: {
+                            size: 6
+                        }
+                    },
+                    xaxis: {
+                        type: "category",
+                        categories: dp
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function(value) {
+                                return value + " ltrs";
+                            }
+                        },
+                    },
+                    grid: {
+                        borderColor: "rgba(77, 138, 240, .1)"
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'left'
+                    }
+                };
+                var chart = new ApexCharts(document.querySelector("#apexAreat"), optiona);
+                chart.render();
+
+                var optionz = {
+                    chart: {
+                        type: "area",
+                        height: 300,
+                        parentHeightOffset: 0,
+
+                    },
+                    colors: ["#727cf5"],
+                    stroke: {
+                        curve: "smooth",
+                        width: 3
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Sale Cash',
+                        data: rp
+                    }],
+                    markers: {
+                        size: 0,
+                        strokeColor: "#fff",
+                        strokeWidth: 3,
+                        strokeOpacity: 1,
+                        fillOpacity: 1,
+                        hover: {
+                            size: 6
+                        }
+                    },
+                    xaxis: {
+                        type: "category",
+                        categories: dp
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function(value) {
+                                return value + " Rs";
+                            }
+                        },
+                    },
+                    grid: {
+                        borderColor: "rgba(77, 138, 240, .1)"
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'left'
+                    }
+                };
+                var chartrm = new ApexCharts(document.querySelector("#apexArearm"), optionz);
+                chartrm.render();
+            });
+        </script>
+        <div class="col-xl-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Daily Sale Cash</h6>
+                    <div id="apexArearm"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Daily Fuel Sale</h6>
+                    <div id="apexAreat"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <script>
+            var d = [];
+            var r = [];
+            @foreach ($exp as $sr)
+                d.push('{{ $sr->date }}');
+                r.push({{ $sr->exp }});
+            @endforeach
+            $(function() {
+                'use strict';
+                // Apex Line chart start
+                var optione = {
+                    chart: {
+                        type: "area",
+                        height: 300,
+                        parentHeightOffset: 0,
+
+                    },
+                    colors: ["#727cf5"],
+                    stroke: {
+                        curve: "smooth",
+                        width: 3
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Amount',
+                        data: r
+                    }],
+                    markers: {
+                        size: 0,
+                        strokeColor: "#fff",
+                        strokeWidth: 3,
+                        strokeOpacity: 1,
+                        fillOpacity: 1,
+                        hover: {
+                            size: 6
+                        }
+                    },
+                    xaxis: {
+                        type: "category",
+                        categories: d
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function(value) {
+                                return value + " Rs";
+                            }
+                        },
+                    },
+                    grid: {
+                        borderColor: "rgba(77, 138, 240, .1)"
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'left'
+                    }
+                };
+                var charte = new ApexCharts(document.querySelector("#apexAreaexp"), optione);
+                charte.render();
+            });
+        </script>
+        <div class="col-xl-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Monthly Expense Report</h6>
+                    <div id="apexAreaexp"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <script>
+            $(function() {
+                'use strict';
+                var g = [];
+                // var n = [];
+                var date = [];
+                @foreach ($salemy as $sale)
+                    @php
+                        $rtm = $sale->rtm + $sale->adj;
+                        $p = $rtm - $sale->ctm;
+                    @endphp
+                    var gp = '{{ $p }}';
+                    g.push(gp);
+                    date.push('{{ $sale->date }}');
+                @endforeach
+                var options = {
+                    chart: {
+                        type: "area",
+                        height: 300,
+                        parentHeightOffset: 0
+                    },
+                    colors: ["#727cf5"],
+                    stroke: {
+                        curve: "smooth",
+                        width: 3
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Groce Profit',
+                        data: g
+                    }],
+                    markers: {
+                        size: 0,
+                        strokeColor: "#fff",
+                        strokeWidth: 3,
+                        strokeOpacity: 1,
+                        fillOpacity: 1,
+                        hover: {
+                            size: 6
+                        }
+                    },
+                    xaxis: {
+                        type: 'category',
+                        categories: date
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function(value) {
+                                return value + " Rs";
+                            }
+                        }
+                    },
+                    grid: {
+                        borderColor: "rgba(77, 138, 240, .1)"
+                    },
+                    tooltip: {
+                        x: {
+                            format: "dd MMM yyyy"
+                        },
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'left'
+                    }
+                };
+
+                var chart = new ApexCharts(document.querySelector("#apexArea1"), options);
+
+                chart.render();
+            });
+        </script>
+        <div class="col-xl-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Date Wise Groce Profit & Loss Report</h6>
+                    <div id="apexArea1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- <div class="row">
   <div class="col-12 col-xl-12 grid-margin stretch-card">
     <div class="card overflow-hidden">
       <div class="card-body">
@@ -572,7 +586,7 @@
   </div>
 </div> <!-- row --> --}}
 
-{{-- <div class="row">
+    {{-- <div class="row">
   <div class="col-lg-7 col-xl-8 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
@@ -637,7 +651,7 @@
   </div>
 </div> <!-- row --> --}}
 
-{{-- <div class="row">
+    {{-- <div class="row">
   <div class="col-lg-5 col-xl-4 grid-margin grid-margin-xl-0 stretch-card">
     <div class="card">
       <div class="card-body">
@@ -819,15 +833,15 @@
 @endsection
 
 @push('plugin-scripts')
-  <script src="{{ asset('assets/plugins/chartjs/Chart.min.js') }}"></script>
-  <script src="{{ asset('assets/plugins/jquery.flot/jquery.flot.js') }}"></script>
-  <script src="{{ asset('assets/plugins/jquery.flot/jquery.flot.resize.js') }}"></script>
-  <script src="{{ asset('assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-  <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
-  <script src="{{ asset('assets/plugins/progressbar-js/progressbar.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/chartjs/Chart.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/jquery.flot/jquery.flot.js') }}"></script>
+    <script src="{{ asset('assets/plugins/jquery.flot/jquery.flot.resize.js') }}"></script>
+    <script src="{{ asset('assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/progressbar-js/progressbar.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
-  <script src="{{ asset('assets/js/dashboard.js') }}"></script>
-  <script src="{{ asset('assets/js/datepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('assets/js/datepicker.js') }}"></script>
 @endpush

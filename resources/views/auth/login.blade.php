@@ -3,6 +3,7 @@
 @section('noauth')
     <form method="POST" action="{{ route('login') }}">
         @csrf
+
         <div class="page-content d-flex align-items-center justify-content-center">
 
             <div class="row w-100 mx-0 auth-page">
@@ -16,7 +17,7 @@
                             </div> --}}
                             <div class="col-md-12 pl-md-0">
                                 <div class="auth-form-wrapper px-4 py-5">
-                                    <a href="https://hts.com.pk" target="_blank" class="noble-ui-logo d-block mb-2">Haris Technical Solutions <span
+                                    <a href="https://hts.com.pk" target="_blank" class="noble-ui-logo d-block mb-2">FuelPump <span
                                             style="font-size:20px;"> (Pvt.)
                                             Ltd.</span></a>
                                     <h5 class="text-muted font-weight-normal mb-4">Welcome back! Log in to your account.

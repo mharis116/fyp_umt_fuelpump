@@ -1,17 +1,17 @@
 <div id="nav" class="pt-2">
-    <a href="{{route('dash')}}">
+    <a href="{{route('dashboard.main')}}">
         <button class="btn btn-danger ml-3"  data-toggle="tooltip" data-placement="bottom" title="Exit">
-             
+
     <svg width="15" height="15" viewBox="0 0 24 24"  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-out"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
         </button>
     </a>
     <button class='btn btn-primary float-right mm ' data-toggle="tooltip" data-placement="bottom" title="Press F11" id='screen'>
-    
+
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-maximize-2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
 
     </button>
-    
-    <button  class="btn btn-primary float-right mm" type="button" data-toggle="collapse" href="#cacl" role="button" aria-expanded="false" aria-controls="cacl">  
+
+    <button  class="btn btn-primary float-right mm" type="button" data-toggle="collapse" href="#cacl" role="button" aria-expanded="false" aria-controls="cacl">
         <i class="fa fa-calculator "></i>
     </button>
     <button class='btn btn-primary ml-2 mm ' data-toggle="tooltip" data-placement="bottom" title="refresh page" id='refresh'>
@@ -21,7 +21,7 @@
 
 
 <style>
- 
+
     .mm{
         margin-right:15px;
     }
@@ -39,7 +39,7 @@
         width: 320px;
         z-index:100;
         background-color: #5E5858
-        
+
     }
     .display {
         width: 100%;
@@ -87,7 +87,7 @@
         color: #faf4f4;
         cursor: pointer;
         box-shadow:0px 0px 5px #c6eec3;
-        
+
     }
     .buttone{
         width: 60px;
@@ -105,7 +105,7 @@
         color: #faf4f4;
         cursor: pointer;
         box-shadow:0px 0px 5px #9cf399;
-        
+
     }
     .text {
         width: 270px;
@@ -121,12 +121,12 @@
         font-size: 50px;
         line-height: 60px;
         margin: 0 25px;
-        
+
     }
     .red {
         background: #1ba6dd !important;
         color: #ffffff !important;
-        
+
     }
 </style>
     <script>
@@ -135,7 +135,7 @@
         }
 	</script>
 	<div class="container collapse" id="cacl">
-        
+
 		<form name="form">
             <a class="btn btn-danger float-right mt-0" data-toggle="collapse" href="#cacl" role="button" aria-expanded="false" aria-controls="cacl">
                 x
@@ -151,19 +151,19 @@
                     <input type="button" class="button" name="b8" value="8" onClick="calcNumbers(b8.value)">
                     <input type="button" class="button"  name="b9" value="9" onClick="calcNumbers(b9.value)">
 				</div>
-				
+
 				<div class="row  rowc">
                     <input type="button" class="button"  name="b4" value="4" onClick="calcNumbers(b4.value)">
                     <input type="button" class="button"  name="b5" value="5" onClick="calcNumbers(b5.value)">
                     <input type="button" class="button"  name="b6" value="6" onClick="calcNumbers(b6.value)">
 				</div>
-				
+
 				<div class="row  rowc">
                     <input type="button"  class="button" name="b1" value="1" onClick="calcNumbers(b1.value)">
                     <input type="button" class="button"  name="b2" value="2" onClick="calcNumbers(b2.value)">
                     <input type="button" class="button"  name="b3" value="3" onClick="calcNumbers(b3.value)">
 				</div>
-				
+
 				<div class="row  rowc">
                     <input type="button" class="button"  name="b0" value="0" onClick="calcNumbers(b0.value)">
                     <input type="button"  class="button" name="potb" value="." onClick="calcNumbers(potb.value)">
@@ -177,6 +177,6 @@
                     <input type="button" class="buttonb"  name="divb" value="/" onClick="calcNumbers(divb.value)">
                 </div>
 			</div>
-		
+
 		</form>
 	</div>
