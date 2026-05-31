@@ -116,7 +116,7 @@
                                             $last_level_id = null;
                                         @endphp
                                         @foreach(App\Models\HierarchyLevel::dropdown()??[] as $hierarchy_level)
-                                            <option value="{{$hierarchy_level->id}}" {{$dat->hierarchy_level_id == $hierarchy_level->id? 'selected':''}}>{{$hierarchy_level->name}}</option>
+                                            <option value="{{$hierarchy_level->id}}" {{isset($dat)??$dat->hierarchy_level_id == $hierarchy_level->id? 'selected':''}}>{{$hierarchy_level->name}}</option>
                                             @php
                                                 $last_level_id = $hierarchy_level->id;
                                             @endphp
@@ -190,7 +190,7 @@
 @push('scripts')
     <script>
 
-        let user_hierarchy_ids = {!! json_encode($dat->hierarchies->pluck('id')) !!};
+        let user_hierarchy_ids = {!! isset($dat)?json_encode($dat->hierarchies->pluck('id')):'[]' !!};
         let last_level_id = {{ $last_level_id }};
         function load_hierarchy_locations(){
             let hierarchy_level_id = $('#hierarchy_level_id option:selected').val();
