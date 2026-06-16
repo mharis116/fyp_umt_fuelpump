@@ -1,0 +1,88 @@
+#include <Arduino.h>
+
+/* ===============================
+   PIN DEFINITIONS
+   =============================== */
+#define TRIG_PIN 14   // GPIO14 d5
+#define ECHO_PIN 12   // GPIO12 d6
+
+/* ===============================
+   CALIBRATION VALUES
+   (Based on your provided data)
+   =============================== */
+// Distance when the container is EMPTY (0 liters)
+// This is the distance from the sensor to the bottom of the empty container.
+#define DISTANCE_AT_0_LITERS 31.81f // cm
+
+// Distance when the container is FULL (8 liters)
+// This is the distance from the sensor to the water surface at 8 liters.
+#define DISTANCE_AT_8_LITERS 11.90f // cm
+
+// Maximum water volume in the container
+#define MAX_WATER_VOLUME_LITERS 7.00f // liters
+
+void setup() {
+  Serial.begin(115200); // Or 9600 for wider compatibility if needed
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  digitalWrite(TRIG_PIN, LOW); // Ensure trigger is low initially
+  Serial.println("Starting water level monitoring...");
+  Serial.print("Empty container distance: ");
+  Serial.print(DISTANCE_AT_0_LITERS);
+  Serial.println(" cm");
+  Serial.print("Full container distance (8 liters): ");
+  Serial.print(DISTANCE_AT_8_LITERS);
+  Serial.println(" cm");
+  Serial.print("Max water volume: ");
+  Serial.print(MAX_WATER_VOLUME_LITERS);
+  Serial.println(" liters");
+  Serial.println("------------------------------------");
+}
+
+void loop() {
+  // Trigger the sensor
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10); // Send a 10us pulse
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Read the echo pulse
+  long duration = pulseIn(ECHO_PIN, HIGH);
+
+  // Calculate distance (speed of sound ~343m/s or 0.034 cm/us)
+  // Divide by 2 for round trip (to object and back)
+  float distance_cm = duration * 0.0343 / 2; // Using 0.0343 cm/us for better accuracy at 20°C
+
+  Serial.print("Distance: ");
+  Serial.print(distance_cm, 2); // Print with 2 decimal places
+  Serial.print(" cm | ");
+
+  // Calculate water depth based on the empty distance
+  // As distance from sensor decreases, water depth increases.
+  float water_depth_cm = DISTANCE_AT_0_LITERS - distance_cm;
+
+  // Calculate the range of distance that represents the water volume
+  float measurable_distance_range = DISTANCE_AT_0_LITERS - DISTANCE_AT_8_LITERS;
+
+  // Calculate water volume in liters
+  float water_liters = (water_depth_cm / measurable_distance_range) * MAX_WATER_VOLUME_LITERS;
+
+  // Clamp the water_liters value to stay within 0 and MAX_WATER_VOLUME_LITERS
+  if (water_liters < 0) {
+    water_liters = 0;
+  } else if (water_liters > MAX_WATER_VOLUME_LITERS) {
+    water_liters = MAX_WATER_VOLUME_LITERS;
+  }
+
+  // Calculate percentage fullness
+  float fullness_percentage = (water_liters / MAX_WATER_VOLUME_LITERS) * 100.0f;
+
+  Serial.print("Water: ");
+  Serial.print(water_liters, 2); // Print with 2 decimal places
+  Serial.print(" L | ");
+
+  Serial.print("Fullness: ");
+  Serial.print(fullness_percentage, 1); // Print with 1 decimal place
+  Serial.println(" %");
+
+  delay(500); // Wait before next measurement
+}

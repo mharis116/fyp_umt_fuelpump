@@ -1,0 +1,8 @@
+
+Get-CimInstance Win32_SerialPort
+
+pio device list
+
+pio device monitor -e rx
+
+pio  run --target upload --environment rx

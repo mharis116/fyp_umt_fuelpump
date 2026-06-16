@@ -50,12 +50,12 @@
   ::-webkit-scrollbar-track {
     background: #f1f1f1;
   }
-  
+
   /* Handle */
   ::-webkit-scrollbar-thumb {
     background: #888;
   }
-  
+
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(13, 110, 236);
@@ -96,6 +96,16 @@
     display:none;
   }
 }
-@media print { 
-  .no-print { display:none; } 
+@media print {
+  .no-print { display:none; }
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: black !important;
+    position: absolute;
+    top:6px;
+    border-right:0px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display{
+    padding-left: 8px;
 }

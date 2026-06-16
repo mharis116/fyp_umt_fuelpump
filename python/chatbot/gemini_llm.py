@@ -8,10 +8,12 @@ from google.genai import types
 class GeminiLLM:
     def __init__(self, api_key="", endpoint=None):
         # You must provide your actual Gemini API KEY and endpoint.
-        # os.environ["GOOGLE_API_KEY"] = "AIzaSyCyUVL3eODqJNjsOxcLUlppuI86vOtg70c"
+        # os.environ["GOOGLE_API_KEY"] = "AIzaSyB_Zu2z_IreEqpSLTf5W3-k-_q5DrzgtrA"
+        # AIzaSyAusRDQ1xicN_tibzNavBYhEJVH0naBLfw
+        # AIzaSyCLb3IvxD5_FPunuS2gXDJdBGT-P_A-VYk
 
         self.client = genai.Client(
-            api_key='AIzaSyCyUVL3eODqJNjsOxcLUlppuI86vOtg70c',
+            api_key='AIzaSyB_Zu2z_IreEqpSLTf5W3-k-_q5DrzgtrA',
             http_options=types.HttpOptions(api_version='v1alpha')
         )
 
@@ -31,7 +33,7 @@ class GeminiLLM:
         llm_config = llm_config or {}
 
         # Use model from config or default
-        model_name = llm_config.get("model", "gemini-2.0-flash-001")
+        model_name = llm_config.get("model", "gemini-2.5-flash-lite")
 
         # Only include parameters explicitly passed
         config_kwargs = {k: v for k, v in llm_config.items() if k in [

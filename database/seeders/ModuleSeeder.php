@@ -157,7 +157,6 @@ class ModuleSeeder extends Seeder
                     ],
                 ]
             ],
-
             [
                 'module_id' => 3,
                 'name' => "Main Dashboard",
@@ -173,9 +172,354 @@ class ModuleSeeder extends Seeder
                     ],
                 ]
             ],
-
+            [
+                'module_id' => 4,
+                'name' => "Products",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 14,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 15,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 16,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 17,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 18,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 5,
+                'name' => "Suppliers",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 19,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 20,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 21,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 22,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 23,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 6,
+                'name' => "Customers",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 24,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 25,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 26,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 27,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 28,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 7,
+                'name' => "Sales",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 29,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 30,
+                        'name' => 'Read',
+                    ],
+                    // [
+                    //     'id' => 31,
+                    //     'name' => 'Update',
+                    // ],
+                    [
+                        'id' => 32,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 33,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 8,
+                'name' => "Purchases",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 34,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 35,
+                        'name' => 'Read',
+                    ],
+                    // [
+                    //     'id' => 36,
+                    //     'name' => 'Update',
+                    // ],
+                    [
+                        'id' => 37,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 38,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 9,
+                'name' => "Supplier Ledgers",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 40,
+                        'name' => 'Read',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 10,
+                'name' => "Expenses",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 41,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 42,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 43,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 44,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 45,
+                        'name' => 'Global Access',
+                    ],
+                    [
+                        'id' => 46,
+                        'name' => 'Manage Expense Types',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 11,
+                'name' => "Fuel Dips",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 47,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 48,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 49,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 50,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 51,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 12,
+                'name' => "Stock",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 52,
+                        'name' => 'Read',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 13,
+                'name' => "Supplier Payments",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 53,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 54,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 55,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 56,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 57,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 14,
+                'name' => "Customer Payments",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 58,
+                        'name' => 'Create',
+                    ],
+                    [
+                        'id' => 59,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 60,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 61,
+                        'name' => 'Delete',
+                    ],
+                    [
+                        'id' => 62,
+                        'name' => 'Global Access',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 15,
+                'name' => "Fuel Backups",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 63,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 64,
+                        'name' => 'Transfer',
+                    ]
+                ]
+            ],
+            [
+                'module_id' => 16,
+                'name' => "Reports",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 65,
+                        'name' => 'Credit Report',
+                    ],
+                    [
+                        'id' => 66,
+                        'name' => 'Daily Sales Report',
+                    ],
+                    [
+                        'id' => 67,
+                        'name' => 'Profit Loss Report',
+                    ],
+                    [
+                        'id' => 68,
+                        'name' => 'Expense Report',
+                    ],
+                    [
+                        'id' => 69,
+                        'name' => 'Fuel Price Report',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 17,
+                'name' => "Customer Ledgers",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 39,
+                        'name' => 'Read',
+                    ],
+                ]
+            ],
+            [
+                'module_id' => 18,
+                'name' => "Hierarchy Management",
+                'status' => "active",
+                'module_permission_types' => [
+                    [
+                        'id' => 70,
+                        'name' => 'Upload',
+                    ],
+                    [
+                        'id' => 71,
+                        'name' => 'Read',
+                    ],
+                    [
+                        'id' => 72,
+                        'name' => 'Update',
+                    ],
+                    [
+                        'id' => 73,
+                        'name' => 'Delete',
+                    ],
+                ]
+            ],
         ];
         return collect($modules);
     }
 }
+
 

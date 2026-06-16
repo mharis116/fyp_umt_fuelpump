@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +15,15 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->UserSeeder();
+
+        $this->call([
+            // UserSeeder::class,
+            ModuleSeeder::class,
+        ]);
     }
 
     public function UserSeeder(){
-        $t = User::where('email','abc@gmail.com')->first();
+        $t = User::where('email','demo@hts.com.pk')->first();
         if(empty($t)){
             $user = User::create([
                 'name' => 'demo',
@@ -25,6 +31,7 @@ class DatabaseSeeder extends Seeder
                 'account_type' => 'admin',
                 'logo' => '/place/1.png',
                 'isactive' => 1,
+                'is_system' => 1,
                 'password' => Hash::make('00000000'),
             ]);
         }

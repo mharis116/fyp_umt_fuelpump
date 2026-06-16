@@ -1,0 +1,14 @@
+[Unit]
+Description=Fuel Pump FPMS AI Agent App
+After=network.target
+
+[Service]
+User=htsaxon
+Group=htsaxon
+WorkingDirectory=/var/www/fuelpump/python
+ExecStart=/var/www/fuelpump/python/index.sh
+Restart=always
+Environment=PATH=/home/htsaxon/anaconda3/envs/htsaxon/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+[Install]
+WantedBy=multi-user.target

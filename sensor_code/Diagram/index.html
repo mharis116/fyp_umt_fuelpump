@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket Voice & Text Test</title>
+</head>
+
+<body>
+  <h2>WebSocket Voice & Text Test Client</h2>
+
+  <div>
+    <label for="message">Message:</label>
+    <input type="text" id="message" placeholder="Type your message">
+    <button id="sendBtn">Send Text</button>
+    <button id="startVoiceBtn">Start Voice</button>
+    <button id="stopVoiceBtn" disabled>Stop Voice</button>
+  </div>
+
+  <div>
+    <h3>Server Responses:</h3>
+    <pre id="output"></pre>
+  </div>
+
+
+  <!-- <script>
+    const output = document.getElementById("output");
+    const messageInput = document.getElementById("message");
+    const sendBtn = document.getElementById("sendBtn");
+    const startVoiceBtn = document.getElementById("startVoiceBtn");
+    const stopVoiceBtn = document.getElementById("stopVoiceBtn");
+    const SAMPLE_RATE = 24000; // match server output
+
+    // Reusable AudioContext
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
+
+    // Queue for smooth playback
+    let audioQueue = [];
+    let isPlaying = false;
+
+    const ws = new WebSocket("ws://124.29.223.205:8765");
+
+    ws.onopen = () => output.textContent += "Connected to server\n";
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.text) output.textContent += `LLM Text: ${data.text}\n`;
+        if (data.audio) enqueuePCM(data.audio);
+      } catch (err) {
+        output.textContent += `Raw Message: ${event.data}\n`;
+      }
+    };
+
+    ws.onclose = () => output.textContent += "Disconnected from server\n";
+    ws.onerror = (err) => output.textContent += `Error: ${err}\n`;
+
+    sendBtn.onclick = () => {
+      const msg = messageInput.value;
+      if (!msg) return;
+      ws.send(JSON.stringify({ text: msg }));
+      messageInput.value = "";
+    };
+
+    // Enqueue PCM chunk
+    function enqueuePCM(pcmBase64) {
+      const raw = atob(pcmBase64);
+      const buffer = new ArrayBuffer(raw.length);
+      const view = new Uint8Array(buffer);
+      for (let i = 0; i < raw.length; i++) view[i] = raw.charCodeAt(i);
+      const int16 = new Int16Array(buffer);
+      const float32 = new Float32Array(int16.length);
+      for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 0x8000;
+      audioQueue.push(float32);
+      if (!isPlaying) playQueue();
+    }
+
+    // Smooth playback
+    async function playQueue() {
+      isPlaying = true;
+      while (audioQueue.length > 0) {
+        const chunk = audioQueue.shift();
+        const audioBuffer = audioContext.createBuffer(1, chunk.length, SAMPLE_RATE);
+        audioBuffer.getChannelData(0).set(chunk);
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+        source.start();
+        await new Promise(res => source.onended = res); // wait until chunk finishes
+      }
+      isPlaying = false;
+    }
+
+    // Voice capture
+    let sourceNode, processor;
+    startVoiceBtn.onclick = async () => {
+      startVoiceBtn.disabled = true;
+      stopVoiceBtn.disabled = false;
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const voiceContext = new AudioContext({ sampleRate: 16000 });
+      sourceNode = voiceContext.createMediaStreamSource(stream);
+
+      processor = voiceContext.createScriptProcessor(4096, 1, 1); // bigger buffer for smoother sending
+      sourceNode.connect(processor);
+      processor.connect(voiceContext.destination);
+
+      processor.onaudioprocess = (e) => {
+        const inputData = e.inputBuffer.getChannelData(0);
+        const pcm16 = new Int16Array(inputData.length);
+        for (let i = 0; i < inputData.length; i++) {
+          let s = Math.max(-1, Math.min(1, inputData[i]));
+          pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        ws.send(JSON.stringify({ audio: btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer))) }));
+      };
+    };
+
+    stopVoiceBtn.onclick = () => {
+      startVoiceBtn.disabled = false;
+      stopVoiceBtn.disabled = true;
+      if (processor) processor.disconnect();
+      if (sourceNode) sourceNode.disconnect();
+    };
+  </script> -->
+
+
+  <script>
+const output = document.getElementById("output");
+const messageInput = document.getElementById("message");
+const sendBtn = document.getElementById("sendBtn");
+const startVoiceBtn = document.getElementById("startVoiceBtn");
+const stopVoiceBtn = document.getElementById("stopVoiceBtn");
+const SAMPLE_RATE = 24000;
+
+let ws;
+let reconnectInterval = 3000; // try reconnect every 3 seconds
+let reconnecting = false;
+
+// Audio playback
+const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
+let audioQueue = [];
+let isPlaying = false;
+
+function connectWebSocket() {
+    ws = new WebSocket("ws://124.29.223.205:8765");
+
+    ws.onopen = () => {
+        output.textContent += "Connected to server\n";
+        reconnecting = false;
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.text) output.textContent += `LLM Text: ${data.text}\n`;
+            if (data.audio) enqueuePCM(data.audio);
+        } catch (err) {
+            output.textContent += `Raw Message: ${event.data}\n`;
+        }
+    };
+
+    ws.onclose = (event) => {
+        output.textContent += `Disconnected from server (code: ${event.code})\n`;
+        if (!reconnecting) attemptReconnect();
+    };
+
+    ws.onerror = (err) => {
+        output.textContent += `WebSocket error: ${err}\n`;
+        ws.close();
+    };
+}
+
+// Reconnect logic
+function attemptReconnect() {
+    reconnecting = true;
+    output.textContent += `Attempting to reconnect in ${reconnectInterval / 1000} seconds...\n`;
+    setTimeout(() => {
+        output.textContent += "Reconnecting...\n";
+        connectWebSocket();
+    }, reconnectInterval);
+}
+
+// Send text
+sendBtn.onclick = () => {
+    const msg = messageInput.value;
+    if (!msg || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({ text: msg }));
+    messageInput.value = "";
+};
+
+// Audio queue playback
+function enqueuePCM(pcmBase64) {
+    const raw = atob(pcmBase64);
+    const buffer = new ArrayBuffer(raw.length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < raw.length; i++) view[i] = raw.charCodeAt(i);
+    const int16 = new Int16Array(buffer);
+    const float32 = new Float32Array(int16.length);
+    for (let i = 0; i < int16.length; i++) float32[i] = int16[i] / 0x8000;
+    audioQueue.push(float32);
+    if (!isPlaying) playQueue();
+}
+
+async function playQueue() {
+    isPlaying = true;
+    while (audioQueue.length > 0) {
+        const chunk = audioQueue.shift();
+        const audioBuffer = audioContext.createBuffer(1, chunk.length, SAMPLE_RATE);
+        audioBuffer.getChannelData(0).set(chunk);
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+        source.start();
+        await new Promise(res => source.onended = res);
+    }
+    isPlaying = false;
+}
+
+// Voice capture
+let sourceNode, processor;
+startVoiceBtn.onclick = async () => {
+    startVoiceBtn.disabled = true;
+    stopVoiceBtn.disabled = false;
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const voiceContext = new AudioContext({ sampleRate: 16000 });
+    sourceNode = voiceContext.createMediaStreamSource(stream);
+
+    processor = voiceContext.createScriptProcessor(4096, 1, 1);
+    sourceNode.connect(processor);
+    processor.connect(voiceContext.destination);
+
+    processor.onaudioprocess = (e) => {
+        const inputData = e.inputBuffer.getChannelData(0);
+        const pcm16 = new Int16Array(inputData.length);
+        for (let i = 0; i < inputData.length; i++) {
+            let s = Math.max(-1, Math.min(1, inputData[i]));
+            pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        }
+        if (ws.readyState === WebSocket.OPEN)
+            ws.send(JSON.stringify({ audio: btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer))) }));
+    };
+};
+
+stopVoiceBtn.onclick = () => {
+    startVoiceBtn.disabled = false;
+    stopVoiceBtn.disabled = true;
+    if (processor) processor.disconnect();
+    if (sourceNode) sourceNode.disconnect();
+};
+
+// Start connection
+connectWebSocket();
+</script>
+
+</body>
+
+</html>

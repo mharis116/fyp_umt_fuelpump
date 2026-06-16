@@ -1,8 +1,7 @@
 from llama_cpp import Llama
 
 class Llama3LLM:
-    def __init__(self, model_path="/home/htsaxon/Desktop/python/llm/models/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf",
-                 n_ctx=8192, n_threads=8, n_batch=512, n_gpu_layers=1, verbose=False):
+    def __init__(self, model_path="/mnt/usb64/python/llm/models/Meta-Llama-3-8B-Instruct-Q5_K_M.gguf", n_ctx=8192, n_threads=8, n_batch=512, n_gpu_layers=1, verbose=False):
         """
         Initialize the LLaMA LLM.
 

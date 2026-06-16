@@ -1,0 +1,14 @@
+[Unit]
+Description=Fuel Pump MQTT Laravel Subscriber
+After=network.target
+
+[Service]
+User=htsaxon
+Group=htsaxon
+WorkingDirectory=/var/www/fuelpump
+ExecStart=/bin/sh -c "php artisan mqtt:subscribe:fuel"
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
