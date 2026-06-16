@@ -1,0 +1,52 @@
+{
+  "model": "XGBoostClassifier",
+  "version": "v4",
+  "feature_names": [
+    "last_dip_qty",
+    "elapsed_hours",
+    "temperature",
+    "humidity",
+    "total_sales_qty",
+    "total_sales_count",
+    "total_purchase_qty",
+    "total_purchase_count",
+    "qty",
+    "variance",
+    "abs_variance",
+    "heat_dryness",
+    "purchase_variance_ratio",
+    "variance_per_hour",
+    "temp_variance_interaction",
+    "variance_to_sales_ratio",
+    "evap_unexplained",
+    "sensor_jump_flag",
+    "long_gap_flag"
+  ],
+  "target_classes": [
+    "evaporation",
+    "missing_purchase",
+    "normal",
+    "theft"
+  ],
+  "class_mapping": {
+    "0": "evaporation",
+    "1": "missing_purchase",
+    "2": "normal",
+    "3": "theft"
+  },
+  "test_accuracy": 1.0,
+  "test_macro_f1": 1.0,
+  "test_macro_auc": 1.0,
+  "best_params": {
+    "subsample": 0.7,
+    "reg_lambda": 1.0,
+    "reg_alpha": 1.0,
+    "n_estimators": 1000,
+    "min_child_weight": 1,
+    "max_depth": 8,
+    "learning_rate": 0.1,
+    "gamma": 0.2,
+    "colsample_bytree": 0.8
+  },
+  "best_iteration": 557
+}

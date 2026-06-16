@@ -69,7 +69,7 @@
                                     <td>{{$p->qty}} ltrs</td>
                                     <td>{{$p->sighn}} {{$p->change_in_qty}} ltrs</td>
                                     <td>{{$p->temperature??0}} C</td>
-                                    <td>{{$p->humidity??0}} mmHg</td>
+                                    <td>{{$p->humidity??0}} %</td>
                                     <td>
                                         @php
                                             switch($p->predicted_label){

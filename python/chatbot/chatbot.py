@@ -1,5 +1,6 @@
 from chatbot.sql import MySQLExecutor
 from chatbot.gemini_llm import GeminiLLM
+from chatbot.llms.llama3_llm import Llama3LLM
 from chatbot.schema import db_schema, db_constraints
 
 class HTSAXONChatbot:
@@ -8,6 +9,7 @@ class HTSAXONChatbot:
         db_config = {"host":"localhost", "user":"root", "password":"Ai_4845426@", "database":"fuel_pump_filled"}
         self.db = MySQLExecutor(**db_config)
         self.llm = GeminiLLM()
+        # self.llm = Llama3LLM(n_ctx=4096, n_threads=4)
 
     # ---------------- Generic LLM runner ----------------
     def _run_llm(self, prompt: str, llm_config: dict) -> str:
@@ -20,11 +22,15 @@ class HTSAXONChatbot:
             - stop sequences, etc.
         """
         return self.llm.generate(prompt, llm_config)
+        # prompt = self.llm.generate(prompt)
+        # print(prompt)
+        # return prompt
+        # # return self.llm.generate(prompt)
 
     # ---------------- Step 1: SQL generation ----------------
     def _generate_sql(self, query: str) -> str:
         prompt = f"""
-            You are a MySQL SQL generator. 
+            You are a MySQL SQL  regenerator. 
             Generate exactly ONE valid MySQL SELECT query.
 
             Database schema:

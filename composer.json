@@ -10,19 +10,22 @@
     "require": {
         "php": ">=8.2",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^10.10",
+        "laravel/framework": "^12",
         "laravel/tinker": "^2.7",
         "laravel/ui": "4.x",
-        "maatwebsite/excel": "*"
+        "maatwebsite/excel": "*",
+        "monolog/monolog": "^3.10",
+        "php-mqtt/client": "^2.3.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
-        "spatie/laravel-ignition": "^2.0",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
-        "nunomaduro/collision": "7.x",
-        "phpunit/phpunit": "^10.0"
+        "nunomaduro/collision": "8.x",
+        "phpunit/phpunit": "^11.0",
+        "smeghead/php-class-diagram": "*",
+        "spatie/laravel-ignition": "^2.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -51,7 +54,7 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
